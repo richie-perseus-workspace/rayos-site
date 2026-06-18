@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding Automation Fix — Malohn Capital</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#070809;color:#fff;font-family:'Segoe UI',Arial,sans-serif;line-height:1.65;padding:48px 22px}
+.wrap{max-width:780px;margin:0 auto}
+.eyebrow{color:#95D9C0;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+h1{font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.who{color:rgba(255,255,255,.55);font-size:14px;margin-bottom:30px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px 26px;margin-bottom:18px;backdrop-filter:blur(14px)}
+h2{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#95D9C0;margin-bottom:14px}
+p{font-size:15px;color:rgba(255,255,255,.85)}
+.muted{color:rgba(255,255,255,.6);font-size:14px}
+ul{list-style:none;margin-top:6px}
+li{padding:9px 0 9px 24px;position:relative;border-bottom:1px solid rgba(255,255,255,.06);font-size:14.5px;color:rgba(255,255,255,.85)}
+li:last-child{border-bottom:none}
+li::before{content:'';position:absolute;left:0;top:17px;width:7px;height:7px;border-radius:50%;background:#D41F26}
+li.ok::before{background:#95D9C0}
+.flow{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.step{display:flex;gap:12px;align-items:flex-start}
+.pill{flex-shrink:0;background:rgba(149,217,192,.14);border:1px solid rgba(149,217,192,.4);color:#95D9C0;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;letter-spacing:.5px;white-space:nowrap;margin-top:2px}
+.pill.red{background:rgba(212,31,38,.14);border-color:rgba(212,31,38,.4);color:#FF7A7E}
+.step .t{font-size:14.5px;color:rgba(255,255,255,.85)}
+.bad{border-left:2px solid rgba(212,31,38,.5)}
+.good{border-left:2px solid rgba(149,217,192,.5)}
+.foot{color:rgba(255,255,255,.5);font-size:13px;margin-top:26px;text-align:center}
+.foot a{color:#95D9C0;text-decoration:none}
+.cta{background:linear-gradient(135deg,rgba(212,31,38,.14),rgba(149,217,192,.10));border:1px solid rgba(149,217,192,.3)}
+.cta b{color:#95D9C0}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:1px;margin-bottom:28px;font-size:15px}
+.logo .b{color:#95D9C0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="logo"><span class="b">⚡</span> RAYOS</div>
+<div class="eyebrow">Automation Diagnostic and Fix</div>
+<h1>Onboarding Sequence Fix</h1>
+<div class="who">Prepared for Miles and the Malohn Capital team, based on the workflow you walked me through.</div>
+
+<div class="card">
+  <h2>What you are running</h2>
+  <p class="muted">When a client is closed and signs the working capital agreement, GoHighLevel is supposed to kick off onboarding so Jeff can fund them: a confirmation email and reminder text right away, then a second documents sequence shortly after. The intent is solid. The setup underneath it is where the breakdown is.</p>
+</div>
+
+<div class="card">
+  <h2>What is actually breaking</h2>
+  <p class="muted">The two sequences are firing off overlapping, ambiguous tags, the immediate one and the 30 minute one are tangled together, and at some point the timing got changed on the wrong workflow. With no clear map of which tag triggers which sequence, it has been mis-firing and the team has been going back and forth on it for two weeks.</p>
+  <ul>
+    <li>Ambiguous tags (closed vs close immediate vs close one) make it unclear what triggers what</li>
+    <li>The working capital doc sequence and Jeff's documents sequence got crossed</li>
+    <li>A manual timing change landed on the wrong workflow and quietly broke the flow</li>
+    <li>No documentation, so every fix attempt risks breaking it again</li>
+  </ul>
+  <p class="muted" style="margin-top:12px">Worth saying clearly: this is a setup problem, not a GoHighLevel limitation. GHL handles an immediate action plus a delayed action without issue when the triggers are clean.</p>
+</div>
+
+<div class="card">
+  <h2>The fix, before and after</h2>
+  <div class="flow">
+    <div class="step bad"><span class="pill red">Now</span><div class="t">One tangled set of tags firing both sequences, with a hand-edited timer that broke the order.</div></div>
+    <div class="step good"><span class="pill">Step 1</span><div class="t">Map the intended flow on one page: who should get what, and exactly when, signed off by you and Jeff before anything is touched.</div></div>
+    <div class="step good"><span class="pill">Step 2</span><div class="t">Two distinct trigger tags, one per stage. Example: <b>closed-won</b> fires the immediate confirmation, <b>wc-agreement-signed</b> fires the documents sequence. No reused or overlapping tags.</div></div>
+    <div class="step good"><span class="pill">Step 3</span><div class="t">Two cleanly named workflows. The delayed one uses a proper 30 minute Wait step inside the workflow, not a manual timer anyone can bump.</div></div>
+    <div class="step good"><span class="pill">Step 4</span><div class="t">A test contact runs end to end so we confirm both sequences fire in the right order before it touches a real client.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>So it never breaks again</h2>
+  <ul>
+    <li class="ok">A one page automation map: tag, workflow, action, timing, so Jeff and the VA are never guessing</li>
+    <li class="ok">Clear naming on every workflow and node, no more "I think this is the one"</li>
+    <li class="ok">Notes left inside each workflow explaining what it does and what not to touch</li>
+    <li class="ok">Your team stops losing days going back and forth over a sequence</li>
+  </ul>
+</div>
+
+<div class="card cta">
+  <b>What I would do first:</b> rebuild this one onboarding flow cleanly, document it, and hand you the map. Once that is solid, I can work down the rest of your GHL and Zapier automations the same way so the whole backend just runs. Happy to start with this one as a first piece so you can see how I work.
+</div>
+
+<div class="foot">
+  Richie, Rayos, Agency Operating Systems &nbsp;|&nbsp;
+  <a href="https://richie-ai-portfolio.vercel.app">Portfolio</a> &nbsp;|&nbsp;
+  <a href="mailto:richie.at.perseus@gmail.com">richie.at.perseus@gmail.com</a> &nbsp;|&nbsp; +1 (403) 966-9522
+</div>
+</div>
+</body>
+</html>
