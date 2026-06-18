@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ampra Slack Knowledge Agent — Architecture & Scope</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#070809;color:#fff;font-family:'Segoe UI',Arial,sans-serif;line-height:1.65;padding:48px 22px}
+.wrap{max-width:820px;margin:0 auto}
+.eyebrow{color:#95D9C0;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+h1{font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.who{color:rgba(255,255,255,.55);font-size:14px;margin-bottom:30px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px 26px;margin-bottom:18px;backdrop-filter:blur(14px)}
+h2{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#95D9C0;margin-bottom:14px}
+h3{font-size:15px;font-weight:700;margin:14px 0 6px}
+p{font-size:15px;color:rgba(255,255,255,.85)}
+.muted{color:rgba(255,255,255,.62);font-size:14.5px}
+ul{list-style:none;margin-top:6px}
+li{padding:8px 0 8px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,.06);font-size:14.5px;color:rgba(255,255,255,.85)}
+li:last-child{border-bottom:none}
+li::before{content:'';position:absolute;left:0;top:16px;width:7px;height:7px;border-radius:50%;background:#95D9C0}
+li.q::before{background:#D41F26}
+.flow{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.fstep{display:flex;gap:12px;align-items:flex-start}
+.num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(149,217,192,.15);border:1px solid rgba(149,217,192,.4);color:#95D9C0;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.fstep .t{font-size:14.5px;color:rgba(255,255,255,.85)}
+.fstep .t b{color:#fff}
+code{background:rgba(149,217,192,.12);color:#B8EBD7;padding:1px 7px;border-radius:5px;font-size:13px}
+.foot{color:rgba(255,255,255,.5);font-size:13px;margin-top:26px;text-align:center}
+.foot a{color:#95D9C0;text-decoration:none}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:1px;margin-bottom:26px;font-size:15px}
+.logo .b{color:#95D9C0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="logo"><span class="b">⚡</span> RAYOS</div>
+<div class="eyebrow">Architecture and Scope</div>
+<h1>Ampra Internal Slack Knowledge Agent</h1>
+<div class="who">Prepared by Richie for Julien and Dustin. A first-pass architecture for an agent that answers employee questions in Slack from Ampra's SOPs.</div>
+
+<div class="card">
+  <h2>The objective</h2>
+  <p class="muted">A Slack agent that answers team questions instantly using Ampra's own SOPs in Google Shared Drive, so people self-serve instead of interrupting each other or digging through Docs. It should answer only from approved SOPs, cite the source, and hand off cleanly when it does not know.</p>
+</div>
+
+<div class="card">
+  <h2>Questions to lock before building</h2>
+  <p class="muted">The fastest way to waste a build is to guess these. A few answers from you two and the scope tightens immediately:</p>
+  <ul>
+    <li class="q">Which Shared Drive or folders are the source of truth, and roughly how many docs?</li>
+    <li class="q">How often do the SOPs change? (this sets the re-index cadence)</li>
+    <li class="q">Trigger preference: mention the bot, a <code>/ask</code> slash command, or a dedicated #ask-ampra channel?</li>
+    <li class="q">Strict mode (answers only from SOPs, always cites) or also allowed to give general help?</li>
+    <li class="q">When it has no answer, where should it route the person? (a human, an #ops channel)</li>
+    <li class="q">Confirmed that Ampra owns the Google Cloud project, Slack app, and hosting?</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Recommended architecture</h2>
+  <p class="muted">Two pipelines, both on reliable, established tooling. AI is used only at the answer step, with guardrails. This is a retrieval augmented generation (RAG) setup, deterministic where it can be.</p>
+
+  <h3>1. Ingestion (scheduled + on demand)</h3>
+  <div class="flow">
+    <div class="fstep"><span class="num">1</span><div class="t">n8n lists SOP docs in the Shared Drive via the <b>Google Drive API</b></div></div>
+    <div class="fstep"><span class="num">2</span><div class="t">Pulls each doc's text via the <b>Google Docs API</b>, chunks it (about 500 to 800 tokens, with overlap)</div></div>
+    <div class="fstep"><span class="num">3</span><div class="t">Embeds the chunks and upserts them into a <b>vector store</b> (Supabase pgvector recommended: low cost, Ampra-owned, simple. Pinecone is the alternative)</div></div>
+    <div class="fstep"><span class="num">4</span><div class="t">Stores metadata with each chunk: doc title, link, last modified. Re-indexes nightly plus a manual trigger</div></div>
+  </div>
+
+  <h3>2. Answering (live)</h3>
+  <div class="flow">
+    <div class="fstep"><span class="num">1</span><div class="t">Slack Events API fires on a mention or <code>/ask</code> command into an n8n webhook</div></div>
+    <div class="fstep"><span class="num">2</span><div class="t">The question is embedded and run against the vector store, top 4 to 6 matching chunks returned</div></div>
+    <div class="fstep"><span class="num">3</span><div class="t">Claude answers using only those chunks, with a system prompt that forces it to cite the source SOP and link, and to say it does not have it documented rather than guess</div></div>
+    <div class="fstep"><span class="num">4</span><div class="t">The answer posts back in the Slack thread with source links. No match means it routes to the human or channel you choose</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Why this stack (the reliability question)</h2>
+  <p class="muted">Established orchestration (n8n) plus a managed vector store plus Claude is dependable and maintainable in a real business. Experimental agent frameworks tend to break in production. The pipeline stays deterministic, and AI only runs at the generation step where it is wrapped in guardrails. This is the difference between a demo and something the team can actually rely on every day.</p>
+</div>
+
+<div class="card">
+  <h2>Reliability and guardrails</h2>
+  <ul>
+    <li>Strict prompt: answer only from retrieved SOPs, always cite the source, never invent</li>
+    <li>No-match fallback that escalates to a person or an ops channel instead of guessing</li>
+    <li>Every question and answer logged. Bonus: that log shows the most-asked questions, which surfaces exactly which SOPs are missing or unclear and should be written next</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Ownership, security, maintainability</h2>
+  <ul>
+    <li>Ampra owns the Google Cloud project, Slack app, vector store, and n8n instance and all credentials. No lock-in.</li>
+    <li>Least-privilege access: a read-only service account scoped to the SOP Shared Drive only</li>
+    <li>Clear naming on every workflow and node, with notes inside explaining what each does</li>
+    <li>A one-page runbook: how to add an SOP, how to rotate keys, what not to touch</li>
+    <li>Secrets in the credential store, never hardcoded</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Phasing</h2>
+  <ul>
+    <li><b>Phase 1 (MVP):</b> one Shared Drive, mention trigger, top-k retrieval with citations, manual re-index. Prove it works on a seed set of SOPs.</li>
+    <li><b>Phase 2:</b> slash command and dedicated channel, nightly auto re-index, no-match escalation, thumbs up/down feedback on answers.</li>
+    <li><b>Phase 3:</b> a most-asked-questions report that flags SOP gaps. This turns the agent into an insight tool, not just a lookup.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>How I would build it</h2>
+  <p class="muted">Claude Code with skills and memory files to scaffold the n8n workflows, the retrieval logic, and the guardrail prompt quickly, then test against a seed set of SOPs before it touches the team. Idea to working draft fast, then hardened into something reliable.</p>
+</div>
+
+<div class="foot">Richie, Rayos &nbsp;|&nbsp; <a href="https://richie-ai-portfolio.vercel.app">Portfolio</a> &nbsp;|&nbsp; <a href="mailto:richie.at.perseus@gmail.com">richie.at.perseus@gmail.com</a></div>
+</div>
+</body>
+</html>
