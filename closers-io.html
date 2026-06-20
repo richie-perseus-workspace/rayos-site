@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vett for Closers.io — Automated Rep Screening</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070a12;--bg-2:#0c1019;--card:#121723;--card-2:#0f1420;
+  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.14);
+  --blue:#2f6bff;--blue-bright:#4d82ff;--blue-glow:rgba(47,107,255,.4);
+  --green:#36d37e;--white:#fff;--w60:rgba(255,255,255,.62);--w40:rgba(255,255,255,.4);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--white);line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+.orb-1{width:560px;height:560px;background:radial-gradient(circle,rgba(47,107,255,.22) 0%,transparent 70%);top:-160px;right:-120px}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(7,10,18,.8);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);height:62px;display:flex;align-items:center}
+.nav-in{max-width:1080px;margin:0 auto;width:100%;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:20px;letter-spacing:1px}
+.logo span{color:var(--blue)}
+.btn{display:inline-block;text-decoration:none;font-weight:700;border-radius:10px;cursor:pointer;transition:.18s;font-size:14px}
+.btn-primary{background:var(--blue);color:#fff;padding:12px 24px;box-shadow:0 6px 20px var(--blue-glow)}
+.btn-primary:hover{background:var(--blue-bright);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--border-2);padding:12px 24px}
+.btn-ghost:hover{border-color:var(--blue);background:rgba(47,107,255,.1)}
+
+.hero{position:relative;overflow:hidden;padding:100px 0 80px;text-align:center}
+.eyebrow{display:inline-block;background:rgba(47,107,255,.12);border:1px solid rgba(47,107,255,.4);color:var(--blue-bright);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:26px}
+h1{font-size:clamp(38px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:22px}
+h1 span{color:var(--blue)}
+.hero p{font-size:19px;color:var(--w60);max-width:620px;margin:0 auto 36px;font-weight:300}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+section{padding:70px 0;border-top:1px solid var(--border)}
+.eyebrow-s{font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+h2{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1px;line-height:1.12;margin-bottom:16px}
+.lead{font-size:17px;color:var(--w60);max-width:640px;margin-bottom:38px}
+
+.problem{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+.p-card .big{font-size:30px;font-weight:800;color:var(--blue);margin-bottom:6px}
+.p-card p{font-size:14px;color:var(--w60)}
+
+.feat{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.f-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px}
+.f-card h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.f-card p{font-size:14.5px;color:var(--w60)}
+.chk{color:var(--green);margin-right:8px;font-weight:800}
+
+.wl{background:linear-gradient(135deg,rgba(47,107,255,.12),rgba(47,107,255,.03));border:1px solid rgba(47,107,255,.3);border-radius:20px;padding:40px}
+.wl h2 span{color:var(--blue)}
+.wl ul{list-style:none;margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wl li{font-size:15px;color:rgba(255,255,255,.85);padding-left:26px;position:relative}
+.wl li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:800}
+
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+.fl{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center}
+.fl .n{width:30px;height:30px;border-radius:50%;background:rgba(47,107,255,.15);border:1px solid rgba(47,107,255,.5);color:var(--blue-bright);font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.fl h4{font-size:15px;font-weight:700;margin-bottom:5px}
+.fl p{font-size:13px;color:var(--w60)}
+
+.plans{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:720px}
+.plan{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative}
+.plan.feature{border-color:var(--blue);background:rgba(47,107,255,.06)}
+.plan .tag{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:700;margin-bottom:10px}
+.plan .price{font-size:34px;font-weight:800;margin-bottom:4px}
+.plan .price span{font-size:14px;color:var(--w60);font-weight:500}
+.plan .desc{font-size:13.5px;color:var(--w60);margin-bottom:16px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.plan li{font-size:14px;color:rgba(255,255,255,.85);padding-left:22px;position:relative}
+.plan li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:800}
+
+.cta-final{text-align:center;padding:90px 0}
+.cta-final h2{margin-bottom:16px}
+.cta-final p{color:var(--w60);max-width:540px;margin:0 auto 32px;font-size:17px}
+
+footer{border-top:1px solid var(--border);padding:36px 0;text-align:center;color:var(--w40);font-size:13px}
+footer a{color:var(--blue);text-decoration:none}
+
+@media(max-width:820px){.problem,.feat,.flow,.plans,.wl ul{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-in">
+  <div class="logo">VE<span>TT</span></div>
+  <a href="https://calendly.com/richie-perseus-io/30min" target="_blank" class="btn btn-primary">Book a Call</a>
+</div></nav>
+
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="wrap" style="position:relative;z-index:2">
+    <div class="eyebrow">Built for Closers.io</div>
+    <h1>Screen every applicant Loom<br><span>automatically. Ranked. Branded.</span></h1>
+    <p>You place reps at volume. Vett watches every applicant video that comes in, scores it against your scorecard, and hands you a ranked shortlist, so your team stops drowning in Looms and starts placing faster.</p>
+    <div class="hero-cta">
+      <a href="https://calendly.com/richie-perseus-io/30min" target="_blank" class="btn btn-primary">Book a Call</a>
+      <a href="#how" class="btn btn-ghost">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow-s">The volume problem</div>
+    <h2>Recruiting reps does not scale by hand.</h2>
+    <div class="lead">When placing closers and setters is the business, the bottleneck is not finding applicants. It is watching all of them.</div>
+    <div class="problem">
+      <div class="p-card"><div class="big">100s</div><p>of applicant Loom videos flooding in every week across your roles.</p></div>
+      <div class="p-card"><div class="big">5-10 min</div><p>per video to watch, judge, and take notes manually. It adds up to days.</p></div>
+      <div class="p-card"><div class="big">Good ones</div><p>sit in the queue and go cold while your team works through the pile.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow-s">How Vett works</div>
+    <h2>From inbox to ranked shortlist, automatically.</h2>
+    <div class="flow">
+      <div class="fl"><div class="n">1</div><h4>Applicant applies</h4><p>Loom, YouTube, or MP4 comes in through your existing funnel.</p></div>
+      <div class="fl"><div class="n">2</div><h4>Vett transcribes</h4><p>Every video is transcribed and read in full, automatically.</p></div>
+      <div class="fl"><div class="n">3</div><h4>AI scores it</h4><p>Scored against your scorecard: tonality, structure, objection handling, whatever you define.</p></div>
+      <div class="fl"><div class="n">4</div><h4>You get a shortlist</h4><p>Ranked candidates with reasons, pushed to Slack or SMS. You only watch the top few.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow-s">What you get</div>
+    <h2>Built for a recruitment operation.</h2>
+    <div class="feat">
+      <div class="f-card"><h3><span class="chk">✓</span>Custom scorecards per role</h3><p>Score closers and setters on different criteria. Define exactly what a great rep looks like for each client.</p></div>
+      <div class="f-card"><h3><span class="chk">✓</span>Multiple client workspaces</h3><p>Keep each client's roles, scorecards, and candidates separate and organized in one place.</p></div>
+      <div class="f-card"><h3><span class="chk">✓</span>Priority scoring at volume</h3><p>Built to handle thousands of screens a month without your team lifting a finger.</p></div>
+      <div class="f-card"><h3><span class="chk">✓</span>Slack and SMS alerts</h3><p>The moment a high scorer comes in, your team knows. No more cold top candidates.</p></div>
+      <div class="f-card"><h3><span class="chk">✓</span>API access</h3><p>Plug Vett into your existing recruitment stack and workflows.</p></div>
+      <div class="f-card"><h3><span class="chk">✓</span>Done-for-you onboarding</h3><p>We set up your scorecards, funnels, and workspaces with you. Live fast.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="wl">
+      <div class="eyebrow-s">The white-label play</div>
+      <h2>Resell it as <span>your own product.</span></h2>
+      <div class="lead" style="margin-bottom:6px">This is where it gets interesting for a recruitment company. Vett runs under your brand, and you offer automated screening to the offers you place reps into, as a Closers.io product. New value for your clients, new revenue line for you.</div>
+      <ul>
+        <li>Your branding, your domain, your product</li>
+        <li>Give every client their own screening workspace</li>
+        <li>Charge clients for it, or bundle it into placements</li>
+        <li>Become the recruiter that screens smarter than anyone</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow-s">Pricing</div>
+    <h2>Two ways to run it.</h2>
+    <div class="plans">
+      <div class="plan">
+        <div class="tag">Recruitment Co</div>
+        <div class="price">$399<span>/mo</span></div>
+        <div class="desc">When hiring reps is the business.</div>
+        <ul>
+          <li>2,000 screens / month</li>
+          <li>Priority scoring</li>
+          <li>Multiple client workspaces</li>
+          <li>Done-for-you onboarding</li>
+        </ul>
+      </div>
+      <div class="plan feature">
+        <div class="tag">White-Label</div>
+        <div class="price">Custom</div>
+        <div class="desc">Recruiters reselling to their own clients.</div>
+        <ul>
+          <li>Unlimited screens</li>
+          <li>Your branding + client sub-accounts</li>
+          <li>API access</li>
+          <li>Dedicated support</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="wrap">
+    <h2>Let your team place reps,<br>not watch Looms.</h2>
+    <p>Book a quick call and I will set up a live demo screening real applicant videos against a Closers.io scorecard.</p>
+    <a href="https://calendly.com/richie-perseus-io/30min" target="_blank" class="btn btn-primary">Book a Call</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Vett &nbsp;|&nbsp; <a href="mailto:richie.at.perseus@gmail.com">richie.at.perseus@gmail.com</a> &nbsp;|&nbsp; +1 (403) 966-9522</div>
+</footer>
+
+</body>
+</html>
